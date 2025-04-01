@@ -10,10 +10,22 @@ public class BarrelCtrl : MonoBehaviour
     [Header("Explosion Effect")] public GameObject explosionEffect;
     //  Hp
     private int hpCnt;
+    
+    //  Texture
+    public Texture[] textures;
+    private new MeshRenderer renderer;
+    
+    //  RigidBody
+    private Rigidbody rb;
 
     private void Awake()
     {
         hpCnt = 3;
+        
+        rb = GetComponent<Rigidbody>();
+        
+        renderer = GetComponentInChildren<MeshRenderer>();
+        renderer.material.mainTexture = textures[UnityEngine.Random.Range(0, textures.Length)];
     }
 
     public void OnCollisionEnter(Collision other)
@@ -30,7 +42,9 @@ public class BarrelCtrl : MonoBehaviour
                 IndirectDamage(transform.position);
                 
                 GameObject explosion = Instantiate(explosionEffect, cp.point, rot);
-                Destroy(explosion, 5f);
+                explosion.GetComponent<ParticleSystem>().Play();
+                
+                Destroy(explosion, 4f);
                 
                 //  추가적인 폭발 방지를 위한 코드
                 GetComponent<CapsuleCollider>().enabled = false;
@@ -48,6 +62,7 @@ public class BarrelCtrl : MonoBehaviour
     //     Destroy(gameObject, 3f);
     // }
     
+    
     //  Explosion Radius Gizmos
     private void OnDrawGizmos()
     {
@@ -55,7 +70,7 @@ public class BarrelCtrl : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, radius);
     }
 
-    void IndirectDamage(Vector3 pos)
+    private void IndirectDamage(Vector3 pos)
     {
         Collider[] colliders = Physics.OverlapSphere(pos, radius, 1 << 3);
         
@@ -69,6 +84,29 @@ public class BarrelCtrl : MonoBehaviour
             rb.constraints = RigidbodyConstraints.None;
             
             rb.AddExplosionForce(1500f, pos, radius, 1200f);
+
+            //  Revert Massive
+            coll.gameObject.GetComponent<BarrelCtrl>().RevertBarrelMassive();
         }
     }
+    
+    //  원래의 Massive로 돌려 놓는 Handler
+    public void RevertBarrelMassive()
+    {
+        if (hpCnt > 0)
+        {
+            Debug.Log("Revert Barrel Massive" + gameObject.name);
+            StartCoroutine(RevertCoroutine());   
+        }
+    }
+
+    private IEnumerator RevertCoroutine()
+    {
+        while (rb.mass <= 20.0f)
+        {
+            rb.mass += 0.1f;
+            yield return new WaitForSeconds(0.02f);
+        }
+    }
+    
 }

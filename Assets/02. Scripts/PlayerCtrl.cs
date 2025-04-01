@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerCtrl : MonoBehaviour
@@ -9,10 +10,17 @@ public class PlayerCtrl : MonoBehaviour
     //  Properties
     [SerializeField] private float moveSpeed;
     [SerializeField] private float rotateSpeed;
+    
+    //  Particles
+    [Header("Muzzle Flash")]
+    [SerializeField] private MeshRenderer muzzleFlash;
 
     private void Awake()
     {
         anim = GetComponent<Animation>();
+        
+        //  Disable MuzzleFlash
+        muzzleFlash.enabled = false;
     }
 
     private void Start()
@@ -48,5 +56,19 @@ public class PlayerCtrl : MonoBehaviour
         //  Rotate
         float r = Input.GetAxis("Mouse X");
         transform.Rotate(Vector3.up * r * rotateSpeed * Time.deltaTime);
+    }
+
+    public void ShowPlayerMuzzleFlash()
+    {
+        StartCoroutine(ShowMuzzleFlashCoroutine());
+    }
+
+    private IEnumerator ShowMuzzleFlashCoroutine()
+    {
+        muzzleFlash.enabled = true;
+        
+        yield return new WaitForSeconds(0.2f);
+        
+        muzzleFlash.enabled = false;
     }
 }
