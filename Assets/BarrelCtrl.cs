@@ -7,11 +7,14 @@ public class BarrelCtrl : MonoBehaviour
     // [Header("Radius")]
     private float radius = 5f;
 
+    //  Explosion Effect Prefab
     [Header("Explosion Effect")] public GameObject explosionEffect;
+    
     //  Hp
     private int hpCnt;
     
     //  Texture
+    [Header("Texture")]
     public Texture[] textures;
     private new MeshRenderer renderer;
     
@@ -25,7 +28,7 @@ public class BarrelCtrl : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         
         renderer = GetComponentInChildren<MeshRenderer>();
-        renderer.material.mainTexture = textures[UnityEngine.Random.Range(0, textures.Length)];
+        renderer.material.mainTexture = textures[UnityEngine.Random.Range(0, textures.Length)]; //  Texture Random 추출
     }
 
     public void OnCollisionEnter(Collision other)
@@ -74,7 +77,6 @@ public class BarrelCtrl : MonoBehaviour
     {
         Collider[] colliders = Physics.OverlapSphere(pos, radius, 1 << 3);
         
-        Rigidbody rb;
         foreach (var coll in colliders)
         {
             rb = coll.GetComponent<Rigidbody>();
