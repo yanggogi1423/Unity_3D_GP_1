@@ -13,7 +13,7 @@ using UnityEngine;
        [Range(2.0f, 20.0f)]
        public float height = 2f;
        
-       public float targetOffset = 3f;
+       public float targetOffset = 5f;
        
        //   SmoothDamp
        Vector3 velocity = Vector3.zero;
@@ -36,12 +36,12 @@ using UnityEngine;
            //   TODO : SmoothDamp으로 변경해야 함
            transform.position = Vector3.SmoothDamp(transform.position, GetMove(), ref velocity, 0.1f);
            // transform.position = Vector3.Lerp(transform.position, GetMove(), 0.1f);
-           transform.LookAt(target.transform.position + target.transform.up * targetOffset);
+           transform.LookAt(target.transform.position + Vector3.up * targetOffset);
        }
    
        private Vector3 GetMove()
        {
-           return (target.transform.position + (Vector3.back * distance) + (Vector3.up * height));
+           return (target.transform.position - (target.transform.forward * distance) + (Vector3.up * height));
        }
    }
 
