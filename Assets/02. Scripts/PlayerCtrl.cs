@@ -1,9 +1,17 @@
 using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerCtrl : MonoBehaviour
 {
+    [Header("Player Properties")] 
+    public int maxHp;
+    public int curHp;
+
+    [Header("Player UIs")] public UnityEvent onUpdateHpUI = new UnityEvent();
+    
     //  Animation
     private Animation anim;
     
@@ -21,6 +29,9 @@ public class PlayerCtrl : MonoBehaviour
         
         //  Disable MuzzleFlash
         muzzleFlash.enabled = false;
+        
+        //  Init Properties
+        maxHp = curHp = 50;
     }
 
     private void Start()
@@ -56,6 +67,12 @@ public class PlayerCtrl : MonoBehaviour
         //  Rotate
         float r = Input.GetAxis("Mouse X");
         transform.Rotate(Vector3.up * r * rotateSpeed * Time.deltaTime);
+    }
+
+    public void OnAttack()
+    {
+        curHp -= 1;
+        onUpdateHpUI.Invoke();
     }
 
     public void ShowPlayerMuzzleFlash()
