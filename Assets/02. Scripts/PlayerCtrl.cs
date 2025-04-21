@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class PlayerCtrl : MonoBehaviour
 {
@@ -22,6 +23,9 @@ public class PlayerCtrl : MonoBehaviour
     //  Particles
     [Header("Muzzle Flash")]
     [SerializeField] private MeshRenderer muzzleFlash;
+    
+    // UI Elements For Player
+    public Image playerHpBar;
 
     private void Awake()
     {
@@ -72,6 +76,8 @@ public class PlayerCtrl : MonoBehaviour
     public void OnAttack()
     {
         curHp -= 1;
+        
+        playerHpBar.fillAmount = curHp / (float)maxHp;
         onUpdateHpUI.Invoke();
     }
 

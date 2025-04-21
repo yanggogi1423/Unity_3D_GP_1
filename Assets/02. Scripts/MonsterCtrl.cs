@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -27,7 +28,12 @@ public class MonsterCtrl : MonoBehaviour
     public float traceDist = 10.0f;
     public float attackDist = 2.0f;
 
-    [Header("Monster Properties")] public int hp = 10;
+    [Header("Monster Properties")]
+    public int maxHp = 100;
+    public int curHp;
+    
+    //  Effects
+    private GameObject bloodEffect;
 
     private void Awake()
     {
@@ -35,6 +41,12 @@ public class MonsterCtrl : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         
         anim = GetComponent<Animator>();
+        
+        //  Health
+        curHp = maxHp;
+        
+        //  Find Effect From Resources
+        bloodEffect = Resources.Load<GameObject>("BloodSprayEffect");
     }
 
     private void Start()
@@ -178,16 +190,34 @@ public class MonsterCtrl : MonoBehaviour
         if (collision.gameObject.tag == "BULLET")
         {
             //  Hp가 추가로 감소하는 것은 States에서 Collider를 해제함.
+
+            //  GetDamageNum : 10
+            curHp -= 10;
             
-            hp--;
-            
-            if(hp <= 0) ChangeState(State.Die);
-            else anim.SetTrigger("Hit");
+            if(curHp <= 0) ChangeState(State.Die);
+            else
+            {
+                anim.SetTrigger("Hit");
+
+                StartCoroutine(ShowBloodEffectCoroutine());
+            }
             
             Destroy(collision.gameObject);
         }
     }
-    
+
+    private IEnumerator ShowBloodEffectCoroutine()
+    {
+        bloodEffect.SetActive(true);
+        yield return new WaitForSeconds(1.0f);
+        bloodEffect.SetActive(false);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, traceDist);
+    }
 }
 
 //  기본 클래스 원형 ver

@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - BULLET
+  - PUNCH
   layers:
   - Default
   - TransparentFX
@@ -12,8 +13,8 @@ TagManager:
   - Barrel
   - Water
   - UI
-  - 
-  - 
+  - MONSTER_BODY
+  - MONSTER_PUNCH
   - 
   - 
   - 

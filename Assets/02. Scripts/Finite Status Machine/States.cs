@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 /*
@@ -60,6 +59,9 @@ public class AttackState : BaseState
     {
         //  Monster의 Rotation 보정
         monsterCtrl.transform.LookAt(monsterCtrl.target.transform.position);
+        
+        // TODO : 플레이어 공격 관련 보정 필요
+        monsterCtrl.target.GetComponent<PlayerCtrl>().OnAttack();
         Debug.Log("Player is under attack!");
     }
 
@@ -80,12 +82,32 @@ public class DieState : BaseState
     {
         Debug.Log("Monster died");
         
-        //  Collider 제거
+        //  Collider Disabled
         monsterCtrl.agent.isStopped = true;
         monsterCtrl.GetComponent<CapsuleCollider>().enabled = false;
         
         monsterCtrl.Die();
         monsterCtrl.anim.SetTrigger("Die");
+    }
+
+    public override void OnStateUpdate() { }
+    
+    public override void OnStateExit() { }
+}
+
+//  TODO : p.35까지 했음
+public class PlayerDieState : BaseState
+{
+    public PlayerDieState(MonsterCtrl input) : base(input)
+    {
+        
+    }
+
+    public override void OnStateEnter()
+    {
+        Debug.Log("Player died");
+        
+        monsterCtrl.anim.SetTrigger("PlayerDie");
     }
 
     public override void OnStateUpdate() { }
