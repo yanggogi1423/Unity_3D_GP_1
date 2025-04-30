@@ -26,6 +26,10 @@ public class PlayerCtrl : MonoBehaviour
     
     // UI Elements For Player
     public Image playerHpBar;
+    
+    //  Message -> Monster
+    public delegate void PlayerDieHandler();
+    public static event PlayerDieHandler OnPlayerDie;
 
     private void Awake()
     {
@@ -76,6 +80,12 @@ public class PlayerCtrl : MonoBehaviour
     public void OnAttack()
     {
         curHp -= 1;
+
+        if (curHp <= 0)
+        {
+            GameManager.Instance.IsGameOver = true;
+            PlayerDie();
+        }
         
         playerHpBar.fillAmount = curHp / (float)maxHp;
         onUpdateHpUI.Invoke();
@@ -93,5 +103,11 @@ public class PlayerCtrl : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         
         muzzleFlash.enabled = false;
+    }
+
+    //  TODO : 몬스터와 연결지을 것
+    private void PlayerDie()
+    {
+        OnPlayerDie();
     }
 }

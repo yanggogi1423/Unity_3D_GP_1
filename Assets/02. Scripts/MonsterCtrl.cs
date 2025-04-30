@@ -57,6 +57,11 @@ public class MonsterCtrl : MonoBehaviour
         _fsmCoroutine = StartCoroutine(FSMCoroutine());
     }
 
+    private void OnEnable()
+    {
+        
+    }
+
     private IEnumerator FSMCoroutine()
     {
         while (true)

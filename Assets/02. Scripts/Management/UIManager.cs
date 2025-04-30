@@ -9,6 +9,9 @@ public class UIManager : MonoBehaviour
     public Button optionButton;
     public Button shopButton;
 
+    public GameObject backGround;
+    public GameObject buttonPanel;
+
     private UnityAction action;
 
     private void Start()
@@ -27,5 +30,11 @@ public class UIManager : MonoBehaviour
     private void OnButtonClick(string str)
     {
         Debug.Log($"Click Button : {str}");
+
+        if (str == "Start Button")
+        {
+            backGround.SetActive(false);
+            buttonPanel.SetActive(false);
+        }
     }
 }
