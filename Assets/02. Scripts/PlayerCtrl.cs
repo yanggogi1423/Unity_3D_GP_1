@@ -109,5 +109,10 @@ public class PlayerCtrl : MonoBehaviour
     private void PlayerDie()
     {
         OnPlayerDie();
+        
+        //  GameOver
+        GameManager.Instance.IsGameOver = true;
+        
+        Destroy(gameObject);
     }
 }

@@ -35,6 +35,8 @@ public class UIManager : MonoBehaviour
         {
             backGround.SetActive(false);
             buttonPanel.SetActive(false);
+            
+            GameManager.Instance.IsPlaying = true;
         }
     }
 }

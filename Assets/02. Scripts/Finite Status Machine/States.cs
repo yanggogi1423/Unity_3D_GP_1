@@ -82,11 +82,7 @@ public class DieState : BaseState
     {
         Debug.Log("Monster died");
         
-        //  Collider Disabled
-        monsterCtrl.agent.isStopped = true;
-        monsterCtrl.GetComponent<CapsuleCollider>().enabled = false;
-        
-        monsterCtrl.Die();
+        monsterCtrl.BuffDie();
         monsterCtrl.anim.SetTrigger("Die");
     }
 

@@ -13,7 +13,8 @@ public class MonsterCtrl : MonoBehaviour
         Idle,
         Trace,
         Attack,
-        Die
+        Die,
+        PlayerDieState
     }
 
     private State _curState;
@@ -59,7 +60,20 @@ public class MonsterCtrl : MonoBehaviour
 
     private void OnEnable()
     {
+        Awake();
+        Start();
         
+        //  Collider Enable
+        agent.isStopped = false;
+        GetComponent<CapsuleCollider>().enabled = true;
+
+        PlayerCtrl.OnPlayerDie += this.OnPlayerDie;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.Instance.MonsterDisable();
+        PlayerCtrl.OnPlayerDie -= this.OnPlayerDie;
     }
 
     private IEnumerator FSMCoroutine()
@@ -141,13 +155,16 @@ public class MonsterCtrl : MonoBehaviour
             case State.Die:
                 _fsm.ChangeState(new DieState(this));
                 break;
+            case State.PlayerDieState:
+                _fsm.ChangeState(new PlayerDieState(this));
+                break;
         }
     }
 
     private bool CheckTraceTarget()
     {
         float dist = Vector3.Distance(transform.position, target.position);
-        Debug.Log("Now Distance : " + dist);
+        // Debug.Log("Now Distance : " + dist);
 
         if (dist < traceDist) return true;
         else return false;
@@ -167,28 +184,26 @@ public class MonsterCtrl : MonoBehaviour
         agent.SetDestination(target.position);
     }
 
-    public void Die()
+    public void BuffDie()
     {
         StopCoroutine(_fsmCoroutine);
-        Destroy(gameObject, 1.0f);
-        // StartCoroutine(DieAnimationCoroutine());
+        
+        //  Collider Disabled
+        agent.isStopped = true;
+        GetComponent<CapsuleCollider>().enabled = false;
+        
+        Invoke("Die", 3f);
     }
-    
-    //  Die Animation With Coroutine
-    // private IEnumerator DieAnimationCoroutine()
-    // {
-    //     int cnt = 100;
-    //     
-    //     while (cnt >= 0)
-    //     {
-    //         gameObject.transform.localScale *= 0.95f;
-    //         
-    //         yield return new WaitForSeconds(0.03f);
-    //         cnt--;
-    //     }
-    //     
-    //     Destroy(this.gameObject);
-    // }
+
+    public void Die()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public void OnPlayerDie()
+    {
+        ChangeState(State.PlayerDieState);
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -225,61 +240,3 @@ public class MonsterCtrl : MonoBehaviour
     }
 }
 
-//  기본 클래스 원형 ver
-// public class MonsterCtrl : MonoBehaviour
-// {
-//     private Transform target;
-//     private NavMeshAgent agent;
-//     private Animator anim;
-//
-//     [Header("Animation Properties")] 
-//     public float traceDist = 10.0f;
-//     public float attackDist = 2.0f;
-//     
-//
-//     private void Awake()
-//     {
-//         target = GameObject.FindGameObjectWithTag("Player").transform;
-//         agent = GetComponent<NavMeshAgent>();
-//         
-//         anim = GetComponent<Animator>();
-//     }
-//
-//     private void Start()
-//     {
-//         StartCoroutine(SetStatusCoroutine());
-//     }
-//
-//     private void FixedUpdate()
-//     {
-//         agent.SetDestination(target.position);
-//     }
-//
-//     private IEnumerator SetStatusCoroutine()
-//     {
-//         while (true)
-//         {
-//             float distance = Vector3.Distance(transform.position, target.position);
-//
-//             if (distance < traceDist)
-//             {
-//                 anim.SetBool("IsTrace", true);
-//                 
-//                 if (distance < attackDist)  
-//                 {
-//                     anim.SetBool("IsAttack", true); //  Attack
-//                 }
-//                 else
-//                 {   
-//                     anim.SetBool("IsAttack", false);    //  Only Trace
-//                 }
-//             }
-//             else
-//             {
-//                 agent.isStopped = true;
-//                 anim.SetBool("IsTrace", false); //  Idle
-//             }
-//         }
-//     }
-//     
-// }

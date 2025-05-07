@@ -40,7 +40,13 @@ using UnityEngine;
        }
    
        private Vector3 GetMove()
-       {
+       {    
+           //   Player Die State
+           if (target == null)
+           {
+               return transform.position;
+           }
+           
            return (target.transform.position - (target.transform.forward * distance) + (Vector3.up * height));
        }
    }

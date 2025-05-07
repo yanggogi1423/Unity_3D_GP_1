@@ -25,6 +25,9 @@ public class FireCtrl : MonoBehaviour
 
     private void Update()
     {
+        //  Playing 상태가 아니거나 GameOver일 때 총이 발사되지 않도록 방지
+        if (!GameManager.Instance.IsPlaying || GameManager.Instance.IsGameOver) return;
+        
         if (Input.GetMouseButtonDown(0))
         {
             Instantiate(bulletPrefab, firePos.position, firePos.rotation);
