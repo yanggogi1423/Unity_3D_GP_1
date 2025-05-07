@@ -13,6 +13,9 @@ public abstract class BaseState
         monsterCtrl = input;
     }
 
+    //  TODO : 원래는 HandleInput을 통해 받아야 하는게 맞음.
+    // public abstract BaseState HandleInput();
+
     public abstract void OnStateEnter();
     public abstract void OnStateUpdate();
     public abstract void OnStateExit();

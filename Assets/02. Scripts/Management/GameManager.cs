@@ -3,18 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class GameManager : Singleton<GameManager>
+// public class GameManager : Singleton<GameManager>
+public class GameManager : MonoBehaviour
 {
-    [Header("Spawn Points")]
-    public List<Transform> points = new List<Transform>();
-    
-    [Header("Monster Prefab")]
-    public GameObject monsterPrefab;
+    [Header("Spawn Points")] public List<Transform> points = new List<Transform>();
+
+    [Header("Monster Prefab")] public GameObject monsterPrefab;
     public List<GameObject> monsterPool = new List<GameObject>();
     public int maxMonster = 10;
-    
+
     //  Game Handling
     private bool isGameOver;
+
+    #region SingleTon
+    private static GameManager _instance;
+    public static GameManager Instance { 
+        get
+        {
+            return _instance;
+        }
+    }
+
+#endregion
 
     public bool IsGameOver
     {
@@ -23,6 +33,12 @@ public class GameManager : Singleton<GameManager>
     }
 
     private void Awake()
+    {
+        
+    }
+    
+
+    private void Start()
     {
         Transform spawnPointGroup = GameObject.Find("PointGroup").transform;
         
@@ -34,11 +50,7 @@ public class GameManager : Singleton<GameManager>
         }
         
         SetMonsterPool();
-    }
-    
-
-    private void Start()
-    {
+        
         InvokeRepeating("SpawnMonster", 0, 0.5f);
     }
 
