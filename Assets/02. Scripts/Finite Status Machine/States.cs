@@ -82,8 +82,8 @@ public class DieState : BaseState
     {
         Debug.Log("Monster died");
         
-        monsterCtrl.BuffDie();
         monsterCtrl.anim.SetTrigger("Die");
+        monsterCtrl.BuffDie();
     }
 
     public override void OnStateUpdate() { }

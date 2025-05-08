@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -18,6 +19,10 @@ public class GameManager : MonoBehaviour
     //  Game Handling
     private bool isGameOver;
     private bool isPlaying;
+    
+    //  Game Score
+    public int totalScore;
+    public TMP_Text scoreText;
 
     #region SingleTon
     private static GameManager _instance;
@@ -90,6 +95,9 @@ public class GameManager : MonoBehaviour
         //  Regard to Monster Spawn
         curMonster = 0;
         
+        //  Score Reset
+        totalScore = 0;
+        
         SetMonsterPool();
         
         InvokeRepeating("SpawnMonster", 3f, 0.5f);
@@ -150,6 +158,12 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("All Monster is Full");
         }
-
+    }
+    
+    //  Score
+    public void DisplayScore(int score)
+    {
+        totalScore += score;
+        scoreText.text = $"<color=#00ff00>SCORE :</color>: <color=#ff0000>{totalScore:#,##0}</color>";
     }
 }

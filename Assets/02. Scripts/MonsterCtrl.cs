@@ -19,7 +19,7 @@ public class MonsterCtrl : MonoBehaviour
 
     private State _curState;
     private FSM _fsm;
-    private Coroutine _fsmCoroutine;
+    // private Coroutine _fsmCoroutine;
     
     public Transform target;
     public NavMeshAgent agent;
@@ -32,6 +32,7 @@ public class MonsterCtrl : MonoBehaviour
     [Header("Monster Properties")]
     public int maxHp = 100;
     public int curHp;
+    private bool isDead;
     
     //  Effects
     private GameObject bloodEffect;
@@ -45,6 +46,7 @@ public class MonsterCtrl : MonoBehaviour
         
         //  Health
         curHp = maxHp;
+        isDead = false;
         
         //  Find Effect From Resources
         bloodEffect = Resources.Load<GameObject>("BloodSprayEffect");
@@ -54,8 +56,8 @@ public class MonsterCtrl : MonoBehaviour
     {
         _curState = State.Idle;
         _fsm = new FSM(new IdleState(this));
-
-        _fsmCoroutine = StartCoroutine(FSMCoroutine());
+        
+        StartCoroutine(FSMCoroutine());
     }
 
     private void OnEnable()
@@ -80,6 +82,13 @@ public class MonsterCtrl : MonoBehaviour
     {
         while (true)
         {
+            //  Coroutine이 종료될 때 까지 Continue;
+            if (isDead)
+            {
+                Debug.Log("Coroutine Continue");
+                continue;
+            }
+            
             switch (_curState)
             {
                 case State.Idle:
@@ -186,11 +195,15 @@ public class MonsterCtrl : MonoBehaviour
 
     public void BuffDie()
     {
-        StopCoroutine(_fsmCoroutine);
+        isDead = true;
+        StopAllCoroutines();
         
         //  Collider Disabled
         agent.isStopped = true;
         GetComponent<CapsuleCollider>().enabled = false;
+        
+        //  Score ++ 50 In GameManager
+        GameManager.Instance.DisplayScore(50);
         
         Invoke("Die", 3f);
     }
