@@ -4,6 +4,10 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
+/*
+ * FSM으로 구성했었지만, 과제 제출을 위해 파일을 하나로 통합, Animator만 사용함
+ */
+
 public class MonsterCtrl : MonoBehaviour
 {
     public enum State
@@ -131,9 +135,8 @@ public class MonsterCtrl : MonoBehaviour
                 case State.Die:
                     ChangeState(State.Die);
                     break;
+                
                 //  Hit은 OnCollision으로 관리함
-                // case State.Hit:
-                //     break;
             }
             
             //  0.3초 간격으로 업데이트
@@ -206,6 +209,9 @@ public class MonsterCtrl : MonoBehaviour
             case State.Die:
                 
                 break;
+            case State.PlayerDieState:
+                
+                break;
             default:
                 Debug.LogError($"Invalid state: {_curState}");
                 break;
@@ -225,10 +231,11 @@ public class MonsterCtrl : MonoBehaviour
     private bool CheckTraceTarget()
     {
         float dist = Vector3.Distance(transform.position, target.position);
-        // Debug.Log("Now Distance : " + dist);
 
         if (dist < traceDist) return true;
-        else return false;
+        
+        //  else
+        return false;
     }
     
     private bool CheckAttackTarget()
@@ -261,7 +268,7 @@ public class MonsterCtrl : MonoBehaviour
         anim.SetBool("IsAttack", false);
         
         
-        //  Score ++ 50 In GameManager
+        //  Score + 50 In GameManager
         GameManager.Instance.DisplayScore(50);
         
         Invoke("Die", 3f);

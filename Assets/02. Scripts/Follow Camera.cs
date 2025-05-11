@@ -33,7 +33,8 @@ using UnityEngine;
    
        private void LateUpdate()
        {
-           //   TODO : SmoothDamp으로 변경해야 함
+           if (target == null) return;
+           
            transform.position = Vector3.SmoothDamp(transform.position, GetMove(), ref velocity, 0.1f);
            // transform.position = Vector3.Lerp(transform.position, GetMove(), 0.1f);
            transform.LookAt(target.transform.position + Vector3.up * targetOffset);

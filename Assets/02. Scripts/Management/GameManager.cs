@@ -108,6 +108,7 @@ public class GameManager : MonoBehaviour
         InvokeRepeating("SpawnMonster", 3f, 3f);
     }
 
+    #region Object Pooling 
     private void SetMonsterPool()
     {
         for (int i = 0; i < maxMonster; i++)
@@ -151,7 +152,7 @@ public class GameManager : MonoBehaviour
         
         GameObject _monster = GetMonsterInPool();
 
-        if (_monster != null && curMonster < maxMonster)
+        if (_monster != null && curMonster < maxMonster)    //  cur : 9일 때도 생성 가능 -> cur : 10
         {
             _monster.transform.SetPositionAndRotation(points[index].position, points[index].rotation);
             _monster.SetActive(true);
@@ -165,10 +166,12 @@ public class GameManager : MonoBehaviour
         }
     }
     
+    #endregion
+    
     //  Score
     public void DisplayScore(int score)
     {
         totalScore += score;
-        scoreText.text = $"<color=#00ff00>SCORE :</color>: <color=#ff0000>{totalScore:#,##0}</color>";
+        scoreText.text = $"<color=#00ff00>SCORE :</color> <color=#ff0000>{totalScore:#,##0}</color>";
     }
 }

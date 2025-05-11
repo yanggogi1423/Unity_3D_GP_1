@@ -2811,8 +2811,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0a96ba5b9cec4011bad547a8aee3b8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 100
-  curHp: 100
+  maxHp: 0
+  curHp: 0
   onUpdateHpUI:
     m_PersistentCalls:
       m_Calls: []
@@ -4489,7 +4489,7 @@ MonoBehaviour:
   anim: {fileID: 0}
   traceDist: 10
   attackDist: 2
-  maxHp: 100
+  maxHp: 50
   curHp: 0
   _curState: 0
 --- !u!136 &2077776502

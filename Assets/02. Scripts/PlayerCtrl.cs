@@ -105,7 +105,7 @@ public class PlayerCtrl : MonoBehaviour
         muzzleFlash.enabled = false;
     }
 
-    //  TODO : 몬스터와 연결지을 것
+    //  Using Delegate with monster
     private void PlayerDie()
     {
         OnPlayerDie();
