@@ -284,35 +284,42 @@ public class MonsterCtrl : MonoBehaviour
         ChangeState(State.PlayerDieState);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision col)
     {
-        if (collision.gameObject.tag == "BULLET")
+        if (col.gameObject.tag == "BULLET")
         {
             //  Hp가 추가로 감소하는 것은 States에서 Collider를 해제함.
+
+            ContactPoint cp = col.GetContact(0);
 
             //  GetDamageNum : 10
             curHp -= 10;
             
             if(curHp <= 0) ChangeState(State.Die);
-            
             else
             {
                 anim.SetTrigger("Hit");
-
-                StartCoroutine(ShowBloodEffectCoroutine());
+                Debug.Log("Got hit");
+                
+                //  몬스터 객체 내부에서 생성되는 것을 조금이나마 방지하기 위함
+                Vector3 spawnPos = cp.point + cp.normal * -(0.04f);
+                Quaternion rot = Quaternion.LookRotation(-cp.normal);
+                
+                ShowBloodEffect(spawnPos,rot);
             }
             
-            Destroy(collision.gameObject);
+            Destroy(col.gameObject);
         }
     }
     
     //  Show Blood Effects
-    private IEnumerator ShowBloodEffectCoroutine()
+    void ShowBloodEffect(Vector3 pos, Quaternion rot)
     {
-        Debug.Log("Show Blood Effect");
-        bloodEffect.SetActive(true);
-        yield return new WaitForSeconds(1.0f);
-        bloodEffect.SetActive(false);
+        Debug.Log("Blood!");
+        
+        GameObject blood = Instantiate(bloodEffect, pos, rot);
+        blood.transform.SetParent(transform);
+        Destroy(blood, 1f);
     }
 
     //  Gizmos
