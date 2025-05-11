@@ -33,10 +33,11 @@ public class GameManager : MonoBehaviour
             {
                 //  존재하는 지 확인한다.
                 _instance = FindObjectOfType<GameManager>();
+                
                 if (_instance != null) return _instance;
 
                 //  존재하지 않는다면 생성한다.
-                _instance = new GameManager().AddComponent<GameManager>();
+                _instance = new GameObject().AddComponent<GameManager>();
                 _instance.name = "GameMgr";
             }
 
@@ -80,12 +81,15 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         Transform spawnPointGroup = GameObject.Find("SpawnPointGroup").transform;
-        
-        Transform [] groupChildren = spawnPointGroup.GetComponentsInChildren<Transform>();
 
-        foreach (var point in groupChildren)
+        if (spawnPointGroup != null)
         {
-            points.Add(point);
+            Transform [] groupChildren = spawnPointGroup.GetComponentsInChildren<Transform>();
+
+            foreach (var point in groupChildren)
+            {
+                points.Add(point);
+            }
         }
         
         //  Init Status Values
@@ -100,7 +104,8 @@ public class GameManager : MonoBehaviour
         
         SetMonsterPool();
         
-        InvokeRepeating("SpawnMonster", 3f, 0.5f);
+        //  Invoke Repeating Rate : 3f s
+        InvokeRepeating("SpawnMonster", 3f, 3f);
     }
 
     private void SetMonsterPool()

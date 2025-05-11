@@ -4,11 +4,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-//  FSM 기술을 반영한 ver
 public class MonsterCtrl : MonoBehaviour
 {
-    //  For Using FSM
-    private enum State
+    public enum State
     {
         Idle,
         Trace,
@@ -16,10 +14,6 @@ public class MonsterCtrl : MonoBehaviour
         Die,
         PlayerDieState
     }
-
-    private State _curState;
-    private FSM _fsm;
-    // private Coroutine _fsmCoroutine;
     
     public Transform target;
     public NavMeshAgent agent;
@@ -36,6 +30,9 @@ public class MonsterCtrl : MonoBehaviour
     
     //  Effects
     private GameObject bloodEffect;
+    
+    //  State
+    public State _curState = State.Idle;
 
     private void Awake()
     {
@@ -47,6 +44,7 @@ public class MonsterCtrl : MonoBehaviour
         //  Health
         curHp = maxHp;
         isDead = false;
+        ChangeState(State.Idle);
         
         //  Find Effect From Resources
         bloodEffect = Resources.Load<GameObject>("BloodSprayEffect");
@@ -54,10 +52,7 @@ public class MonsterCtrl : MonoBehaviour
 
     private void Start()
     {
-        _curState = State.Idle;
-        _fsm = new FSM(new IdleState(this));
-        
-        StartCoroutine(FSMCoroutine());
+        StartCoroutine(MonsterBehaviorCoroutine());
     }
 
     private void OnEnable()
@@ -78,7 +73,7 @@ public class MonsterCtrl : MonoBehaviour
         PlayerCtrl.OnPlayerDie -= this.OnPlayerDie;
     }
 
-    private IEnumerator FSMCoroutine()
+    private IEnumerator MonsterBehaviorCoroutine()
     {
         while (true)
         {
@@ -142,33 +137,90 @@ public class MonsterCtrl : MonoBehaviour
             }
             
             //  0.3초 간격으로 업데이트
-            _fsm.UpdateState();
+            UpdateState();
             yield return new WaitForSeconds(0.3f);
         }
     }
 
     private void ChangeState(State newState)
     {
+        ExitState();
+        Debug.Log("New State: " + newState);
         _curState = newState;
+        EnterState();
+    }
+
+    #region State Handler
+    private void EnterState()
+    {
         switch (_curState)
         {
             case State.Idle:
-                _fsm.ChangeState(new IdleState(this));
+                agent.isStopped = true;
+                anim.SetBool("IsTrace", false);
                 break;
             case State.Trace:
-                _fsm.ChangeState(new TraceState(this));
+                agent.isStopped = false;
+                anim.SetBool("IsTrace", true);
+                MoveAndLook();
                 break;
             case State.Attack:
-                _fsm.ChangeState(new AttackState(this));
+                anim.SetBool("IsAttack", true);
                 break;
             case State.Die:
-                _fsm.ChangeState(new DieState(this));
+                Debug.Log("Monster died" + name);
+                
+                anim.SetTrigger("Die");
+                BuffDie();
                 break;
             case State.PlayerDieState:
-                _fsm.ChangeState(new PlayerDieState(this));
+                Debug.Log("Player died");
+        
+                anim.SetTrigger("PlayerDie");
+                break;
+            default:
+                Debug.LogError($"Invalid state: {_curState}");
                 break;
         }
     }
+
+    private void UpdateState()
+    {
+        switch (_curState)
+        {
+            case State.Idle:
+
+                break;
+            case State.Trace:
+                Debug.Log("Trace Updating");
+                MoveAndLook();
+                break;
+            case State.Attack:
+                //  Monster의 Rotation 보정
+                transform.LookAt(target.transform.position);
+        
+                // TODO : 플레이어 공격 관련 보정 필요
+                target.GetComponent<PlayerCtrl>().OnAttack();
+                Debug.Log("Player is under attack!");
+                break;
+            case State.Die:
+                
+                break;
+            default:
+                Debug.LogError($"Invalid state: {_curState}");
+                break;
+        }
+    }
+
+    private void ExitState()
+    {
+        if (_curState == State.Attack)
+        {
+            anim.SetBool("IsAttack", false);
+        }
+    }
+    
+    #endregion
 
     private bool CheckTraceTarget()
     {
@@ -184,7 +236,9 @@ public class MonsterCtrl : MonoBehaviour
         float dist = Vector3.Distance(transform.position, target.position);
         
         if (dist < attackDist) return true;
-        else return false;
+        
+        //  else
+        return false;
     }
 
     //  Handled By States
@@ -198,9 +252,14 @@ public class MonsterCtrl : MonoBehaviour
         isDead = true;
         StopAllCoroutines();
         
-        //  Collider Disabled
+        //  Agent, Collider Disabled
         agent.isStopped = true;
         GetComponent<CapsuleCollider>().enabled = false;
+        
+        //  Handler variable disable
+        anim.SetBool("IsTrace", false);
+        anim.SetBool("IsAttack", false);
+        
         
         //  Score ++ 50 In GameManager
         GameManager.Instance.DisplayScore(50);
@@ -228,6 +287,7 @@ public class MonsterCtrl : MonoBehaviour
             curHp -= 10;
             
             if(curHp <= 0) ChangeState(State.Die);
+            
             else
             {
                 anim.SetTrigger("Hit");
@@ -238,14 +298,17 @@ public class MonsterCtrl : MonoBehaviour
             Destroy(collision.gameObject);
         }
     }
-
+    
+    //  Show Blood Effects
     private IEnumerator ShowBloodEffectCoroutine()
     {
+        Debug.Log("Show Blood Effect");
         bloodEffect.SetActive(true);
         yield return new WaitForSeconds(1.0f);
         bloodEffect.SetActive(false);
     }
 
+    //  Gizmos
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
