@@ -173,5 +173,11 @@ public class GameManager : MonoBehaviour
     {
         totalScore += score;
         scoreText.text = $"<color=#00ff00>SCORE :</color> <color=#ff0000>{totalScore:#,##0}</color>";
+
+        //  Save in lacal
+        if (PlayerPrefs.GetInt("HighScore", 0) < totalScore)
+        {
+            PlayerPrefs.SetInt("HighScore", totalScore);    
+        }
     }
 }
